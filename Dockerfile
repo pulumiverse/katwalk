@@ -1,77 +1,46 @@
 # Usage:
-# ~$ docker build -t docker.io/library/test:test -f Dockerfile .
-# ~$ docker run -it --rm docker.io/library/test:test
+# ~$ docker build -t ghcr.io/usrbinkat/vllm:test -f Dockerfile .
+# ~$ docker run -it --rm --entrypoint bash --hostname cuda --name cuda ghcr.io/usrbinkat/vllm:test
 
-# Use Ubuntu 23.04 Lunar Lobster as the builder image
-FROM ubuntu:lunar AS builder
-
-# Set the chroot build path
-ARG BUILD_PATH='/rootfs'
-
-# Set chroot build release Ubuntu 23.04 Lunar Lobster
-ARG RELEASE='lunar'
-
-# Chroot Apt Packages Include
-ARG BOOTSTRAP_PKGS="\
-vi \
-"
+# Use Ubuntu 22.04 as the builder image
+FROM docker.io/nvidia/cuda:11.8.0-devel-ubuntu22.04
 
 # Apt Packages List
 ARG APT_PKGS="\
-python3-full \
 python3-pip \
-"
-
-# Install debootstrap and create a minimal Ubuntu filesystem
-RUN set -ex \
-    && mkdir -p ${BUILD_PATH} \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends debootstrap \
-    && debootstrap \
-           --variant=minbase \
-           --include="${BOOTSTRAP_PKGS}" \
-           ${RELEASE} ${BUILD_PATH} \
-    && cat /etc/apt/sources.list > ${BUILD_PATH}/etc/apt/sources.list \
-    && echo
-
-COPY apt.conf /rootfs/etc/apt/apt.conf.d/apt.conf
-
-# Update packages in the chroot
-RUN set -ex \
-    && chroot ${BUILD_PATH} apt-get update \
-    && chroot ${BUILD_PATH} apt-get upgrade -y \
-    && chroot ${BUILD_PATH} apt-get clean \
-    && chroot ${BUILD_PATH} apt-get purge -y --auto-remove \
-    && rm -rf ${BUILD_PATH}/var/lib/apt/lists/* \
-    && echo
-
-# Install python inside the chroot environment
-RUN set -ex \
-    && chroot ${BUILD_PATH} apt-get update \
-    && chroot ${BUILD_PATH} apt-get install -y --no-install-recommends ${APT_PKGS} \
-    && chroot ${BUILD_PATH} apt-get clean \
-    && chroot ${BUILD_PATH} apt-get autoremove -y \
-    && chroot ${BUILD_PATH} apt-get purge -y --auto-remove \
-    && rm -rf ${BUILD_PATH}/var/lib/apt/lists/* \
-    && echo
-
-# Build from scratch using rootfs chroot from builder
-FROM scratch
-
-# Python Packages List
-ARG PIP_PKGS="\
-huggingface_hub \
+python3-dev \
+python3-full \
 "
 
 # Permanent VENV
 WORKDIR /root
 
-# Copy the minimal Ubuntu filesystem from the builder image
-COPY --from=builder /rootfs /
+# reduce optional and suggested package installs
+COPY apt.conf /rootfs/etc/apt/apt.conf.d/apt.conf
+COPY main.py /app/main.py
 
-# Install pip packages
+# Update packages
+RUN set -ex \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${APT_PKGS} \
+    && apt-get clean \
+    && apt-get autoremove -y \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo
+
 ENV VIRTUAL_ENV="/opt/venv"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+ENV CUDA_HOME="/usr/local/cuda-11.8"
+
+# Python Packages List
+ARG PIP_PKGS="\
+ray \
+vllm \
+huggingface_hub \
+"
+
+# Install pip packages
 RUN set -ex \
     && cd /root \
     && python3 --version \
@@ -80,4 +49,4 @@ RUN set -ex \
     && echo
 
 # Set the default command
-CMD ["/bin/bash"]
+CMD ["/app/main.py"]
