@@ -1,6 +1,6 @@
 # Usage:
 # ~$ docker build -t ghcr.io/usrbinkat/vllm -f Dockerfile .
-# ~$ docker run -it --rm --gpus=all --hostname cuda --name cuda -v $(pwd)/main.py:/root/main.py --entrypoint bash ghcr.io/usrbinkat/vllm
+# ~$ docker run -it --rm -p 8000:8000 -v /home/kat/Llama-2-7b-chat-hf:/models --gpus=all --hostname cuda --name cuda -v $(pwd)/main.py:/root/main.py --entrypoint bash ghcr.io/usrbinkat/vllm
 
 # Use Ubuntu 22.04 as the builder image
 FROM docker.io/nvidia/cuda:11.8.0-devel-ubuntu22.04

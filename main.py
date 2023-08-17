@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#!/usr/bin/env python3
 import argparse
 import json
 from typing import AsyncGenerator
@@ -65,7 +66,7 @@ async def generate(request: Request) -> Response:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", type=str, default="localhost")
+    parser.add_argument("--host", type=str, default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8000)
     parser = AsyncEngineArgs.add_cli_args(parser)
     args = parser.parse_args()
