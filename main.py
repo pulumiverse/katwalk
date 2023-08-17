@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 import argparse
 import json
-from typing import AsyncGenerator
-from fastapi import BackgroundTasks, FastAPI, Request
-from fastapi.responses import JSONResponse, Response, StreamingResponse
+import torch
+from fastapi import BackgroundTasks, FastAPI, Request, Response
+from fastapi.responses import JSONResponse
 import uvicorn
 from vllm import LLM, SamplingParams
-from vllm.utils import random_uuid
+
 
 MODEL_DIR = "/models"
 app = FastAPI()
 
-# Create an instance of the LLM class using the model directory
-llm = LLM(MODEL_DIR)
+# Create an instance of the LLM class using the model directory and tensor_parallel_size
+tensor_parallel_size = torch.cuda.device_count() if torch.cuda.device_count() > 1 else 1
+llm = LLM(MODEL_DIR, tensor_parallel_size=tensor_parallel_size)
+
+# If multiple GPUs are available, wrap the LLM instance with DataParallel
+if torch.cuda.device_count() > 1:
+    print(f"Using {torch.cuda.device_count()} GPUs")
+    llm = torch.nn.DataParallel(llm)
 
 @app.post("/generate")
 async def generate(request: Request) -> Response:
