@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#!/usr/bin/env python3
 import argparse
 import json
 import torch
@@ -7,22 +8,22 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from vllm import LLM, SamplingParams
 
-
 MODEL_DIR = "/models"
 app = FastAPI()
 
-# Create an instance of the LLM class using the model directory and tensor_parallel_size
-tensor_parallel_size = torch.cuda.device_count() if torch.cuda.device_count() > 1 else 1
-llm = LLM(MODEL_DIR, tensor_parallel_size=tensor_parallel_size)
-
-# If multiple GPUs are available, wrap the LLM instance with DataParallel
-if torch.cuda.device_count() > 1:
-    print(f"Using {torch.cuda.device_count()} GPUs")
-    llm = torch.nn.DataParallel(llm)
+# Create an instance of the LLM class using the model directory
+llm = LLM(MODEL_DIR)
 
 @app.post("/generate")
 async def generate(request: Request) -> Response:
-    request_dict = await request.json()
+    body = await request.body()
+    print("Request Body:", body.decode())  # Print the request body
+
+    try:
+        request_dict = await request.json()
+    except json.JSONDecodeError:
+        return JSONResponse({"error": "Malformed JSON"}, status_code=400)
+
     prompt = request_dict.pop("prompt")
     sampling_params = SamplingParams(**request_dict)
 
