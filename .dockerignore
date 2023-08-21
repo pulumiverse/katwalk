@@ -1,4 +1,6 @@
 .*
 *
-!apt.conf
-!main.py
+!src/*
+!src/*/*
+!src/*/*/*
+!src/*/*/*/*

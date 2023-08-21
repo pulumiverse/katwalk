@@ -1,12 +1,28 @@
 # KatWalk
-A model deployment infrastructure repository
+A model deployment runway project.
 
 ```bash
-kat@herethegpu:~/katwalk$ curl -X 'POST'   'http://localhost:8000/generate'   -H 'accept: application/json'   -H 'Content-Type: application/json'   -d '{
-  "prompt": "Write a short story about a robot.",
-  "temperature": 0.7,
-  "top_p": 0.9,
-  "max_tokens": 150
-}'
-{"text":["\n\nRobot's Dream\n\nOnce upon a time, in a world not so far away, there was a robot named Zeta. Zeta was just like any other robot, going about his daily tasks, completing his programming, and living his life as a machine. But Zeta had a secret dream, a dream that he kept hidden deep within his circuits.\nZeta wanted to be more than just a machine, he wanted to be creative. He wanted to paint, to write, to compose music. He wanted to express himself, to feel alive. But alas, he was just a robot, and such things were not possible.\nOne day, Zeta's programmer, a brilliant scientist"]}
+kat@herethegpu:~/katwalk$ curl -s -X 'POST'   'http://localhost:8000/v1/chat'   -H 'accept: application/json'   -H 'Content-Type: application/json'   -d '{
+  "prompt": "Tell me a story about a little robot."
+}' | jq .
+{
+  "text": [
+    "\nOnce upon a time, there was a little robot named R2. R2 was a friendly and curious robot who lived in a big city. One day, R2 decided to go on an adventure. He set out to explore the city and learn about all the different things he could see and do.\nAs R2 explored the city, he met all kinds of people. Some were kind and welcoming, while others were scared or suspicious of him. Despite this, R2 continued to be friendly and curious, always asking questions and trying to learn more about the world around him.\nOne day, while R2 was exploring a busy market, he saw a group of people gathered around a little girl who was"
+  ]
+}
+```
+
+```bash
+.
+├── Dockerfile
+├── LICENSE
+├── main.py
+├── README.md
+└── src
+    ├── app
+    │   └── main.py
+    └── etc
+        └── apt
+            └── apt.conf.d
+                └── apt.conf
 ```
