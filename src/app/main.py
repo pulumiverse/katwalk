@@ -7,30 +7,31 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from vllm import LLM, SamplingParams
 
-MODEL_DIR = "/model"
+MODEL_DIR = "/models"
 app = FastAPI()
 
 # Create an instance of the LLM class using the model directory
 llm = LLM(MODEL_DIR)
 
-# System instruction string
-SYS_INSTRUCTION = '''You are a helpful assistant.'''
+# SYS instruction string
+SYS_INSTRUCTION = "<s>[INST] <<SYS>> You are a friendly chatbot.<</SYS>>"
 
 # Template
-TEMPLATE = '<s>[INST] <<SYS>> {{ system_prompt }} <</SYS>> {{ user_message }} [/INST]'
+TEMPLATE = SYS_INSTRUCTION + "{{ user_message }} [/INST]"
+
+# Sampling parameters
+TOP_P = 0.9
+MAX_TOKENS = 150
+TEMPERATURE = 0.7
 
 def assemble_prompt(user_prompt):
-    # Strip unwanted characters
+    # Strip unwanted characters including newlines, double quotes, and single quotes
     user_prompt = re.sub(r'[\n\"\']', '', user_prompt).strip()
     
-    print("INFO: prompt_log | original_prompt >> " + user_prompt)
-
     # Replace placeholders in the template with the SYS instruction and user prompt
-    final_prompt = TEMPLATE.replace('{{ system_prompt }}', SYS_INSTRUCTION)
-    final_prompt = final_prompt.replace('{{ user_message }}', json.dumps(user_prompt))
+    final_prompt = TEMPLATE.replace('{{ user_message }}', user_prompt)
     
-    # Log the assembled prompt
-    print("INFO: prompt_log | system_prompt " + final_prompt)
+    print("INFO: assembled_prompt >> " + final_prompt)
     return final_prompt
 
 @app.post("/v1/chat")
@@ -43,9 +44,10 @@ async def generate(request: Request) -> Response:
     except json.JSONDecodeError:
         return JSONResponse({"error": "Malformed JSON"}, status_code=400)
 
-    user_prompt = request_dict.pop("prompt")
+    user_prompt = request_dict.get("prompt")
     final_prompt = assemble_prompt(user_prompt)
-    sampling_params = SamplingParams(**request_dict)
+
+    sampling_params = SamplingParams(temperature=TEMPERATURE, top_p=TOP_P, max_tokens=MAX_TOKENS)
 
     # Generate the results using the LLM instance
     result = llm.generate([final_prompt], sampling_params)  # Pass prompt as a list
