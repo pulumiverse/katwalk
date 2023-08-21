@@ -1,7 +1,7 @@
-# Usage:
+# Example Usage:
 # ~$ docker build -t ghcr.io/usrbinkat/vllm -f Dockerfile .
-# ~$ docker run -it --rm --shm-size=10.24gb -p 8000:8000 --gpus '"device=0,1,2,3"' --hostname cuda --name cuda -v $(pwd)/main.py:/root/test.py -v $HOME/Wizard-Vicuna-13B-Uncensored-HF:/models ghcr.io/usrbinkat/vllm
-# ~$ docker run -it --rm --shm-size=10.24gb -p 8000:8000 --gpus '"device=0,1,2,3"' --hostname cuda --name cuda -v $(pwd)/main.py:/root/test.py -v $HOME/Wizard-Vicuna-13B-Uncensored-HF:/models --entrypoint bash ghcr.io/usrbinkat/vllm
+# ~$ docker run -it --rm --shm-size=10.24gb -p 8000:8000 --gpus=all --hostname cuda --name cuda -v $(pwd)/main.py:/root/test.py -v $HOME/Wizard-Vicuna-7B-HF:/models ghcr.io/usrbinkat/vllm
+# ~$ docker run -it --rm --shm-size=10.24gb -p 8000:8000 --gpus '"device=0"' --hostname cuda --name cuda -v $(pwd)/main.py:/app/main.py -v $HOME/Wizard-Vicuna-7B-HF:/models ghcr.io/usrbinkat/vllm
 
 # Use Ubuntu 22.04 as the builder image
 FROM docker.io/nvidia/cuda:11.8.0-devel-ubuntu22.04
@@ -17,9 +17,8 @@ python3-full \
 ENV CUDA_HOME="/usr/local/cuda-11.8"
 WORKDIR /app
 
-# reduce optional and suggested package installs
-COPY apt.conf /rootfs/etc/apt/apt.conf.d/apt.conf
-COPY main.py /app/main.py
+# Copy ./src tree into container
+ADD ./src /
 
 # Update packages
 RUN set -ex \
@@ -30,7 +29,6 @@ RUN set -ex \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
     && echo
-
 
 # Python Packages List
 ARG PIP_PKGS="\
@@ -50,6 +48,7 @@ RUN set -ex \
 # Set the default command
 CMD ["python3", "/app/main.py"]
 
+# Labels
 LABEL org.opencontainers.image.source=https://github.com/usrbinkat/katwalk
-LABEL org.opencontainers.image.description="KatWalk Server - Distributed LLM API Runtime Container"
+LABEL org.opencontainers.image.description="KatWalk Server - LLM API CUDA Runtime Container"
 LABEL org.opencontainers.image.licenses=APACHE2
