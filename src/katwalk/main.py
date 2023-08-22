@@ -1,3 +1,4 @@
+import os
 import argparse
 import json
 import re
@@ -6,22 +7,26 @@ from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 import uvicorn
 from vllm import LLM, SamplingParams
+import model_pull
 
 MODEL_DIR = "/models"
 app = FastAPI()
 
 # Create an instance of the LLM class using the model directory
-llm = LLM(MODEL_DIR)
+# Read environment variables
+repo = os.getenv("HF_REPO")
+branch = os.getenv("HF_BRANCH", "main")
+destination = f"/models/{repo}/{branch}"
 
 # SYS instruction string
-SYS_INSTRUCTION = "<s>[INST] <<SYS>> You are a friendly chatbot.<</SYS>>"
+SYS_INSTRUCTION = "<s>[INST] <<SYS>> Please provide a meaningful, detailed, and relevant response. <</SYS>>"
 
 # Template
-TEMPLATE = SYS_INSTRUCTION + "{{ user_message }} [/INST]"
+TEMPLATE = SYS_INSTRUCTION + " {{ user_message }} [/INST]"
 
-# Sampling parameters
+# LLM Sampling parameters
 TOP_P = 0.9
-MAX_TOKENS = 150
+MAX_TOKENS = 600
 TEMPERATURE = 0.7
 
 def assemble_prompt(user_prompt):
@@ -59,6 +64,11 @@ async def generate(request: Request) -> Response:
     return JSONResponse(ret)
 
 if __name__ == "__main__":
+    print("INFO: cloning model repositories")
+    model_pull.main()
+    llm = LLM(destination)
+
+    print("INFO: Starting API Server")
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8000)
