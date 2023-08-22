@@ -12,6 +12,19 @@ kat@herethegpu:~/katwalk$ curl -s -X 'POST'   'http://localhost:8000/v1/chat'   
 }
 ```
 
+```
+To perform an initial deployment, run the following commands:
+
+   1. python3 -m venv venv
+   2. source venv/bin/activate
+   3. python -m pip install --upgrade pip setuptools wheel
+   4. python -m pip install -r requirements.txt
+   5. pulumi login file://~/.pulumi/state
+   6. pulumi stack init
+
+Then, run `pulumi up`
+```
+
 ```bash
 .
 ├── Dockerfile
