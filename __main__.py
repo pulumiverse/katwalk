@@ -4,6 +4,7 @@
 import pulumi
 from azure_aci import azure_aci
 
+
 # Import local libraries
 from image_build import docker_build
 from docker_run import docker_run
@@ -95,6 +96,15 @@ if container_runtime == None or container_runtime == "docker" and deploy_service
 
 elif container_runtime == "azure" and deploy_service == True:
     print("Running container in the cloud with Azure Container Instances...")
+    
+    # Set models_path to user provided path
+    # else if None, will default to create and use a docker volume
+    models_path = config.get("modelsPath")
+    
+    # Define the resource group name (if needed)
+    resource_group_name = "myResourceGroup"
+
+    # Call the azure_aci function
     container_name = azure_aci(
         username=hf_username,
         model=hf_repo,
@@ -102,8 +112,11 @@ elif container_runtime == "azure" and deploy_service == True:
         hf_token=hf_token,
         image_name=image_name,
         image_name_full=image_name_full,
-        models_path=models_path
+        password=registry_password,
+        location="East US", # You can customize the location if needed
+        resource_group_name=resource_group_name
     )
+
 
 elif deploy_service == True and container_runtime != None and container_runtime != "docker" and container_runtime != "azure":
     raise ValueError(f"\n\nContainer runtime '{container_runtime}' is not supported.\nPlease set 'runtime' to 'docker' or 'azure'.\n")
