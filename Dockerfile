@@ -44,11 +44,13 @@ vllm \
 GitPython \
 "
 
+COPY requirements.txt /katwalk/requirements.txt
 # Install pip packages
 RUN set -ex \
     && cd /root \
     && python3 --version \
     && python3 -m pip install ${PIP_PKGS} \
+    && python3 -m pip install -r /katwalk/requirements.txt \
     && rm -rf /root/.cache \
     && echo
 
