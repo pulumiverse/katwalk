@@ -1,0 +1,6 @@
+name: katwalk
+description: Katwalk Server - LLM Runtime API Service
+runtime:
+  name: python
+  options:
+    virtualenv: venv
