@@ -1,12 +1,12 @@
-# Exceptions to the default ignore rules
-!rootfs
-!.dockerignore
-!Dockerfile
-!src
-
 # Default to ignore all files
 *
 .*
+
+# Exceptions to the default ignore rules
+!.dockerignore
+!Dockerfile
+!src
+!docker
 
 # Ignore Python cache files
 __pycache__/

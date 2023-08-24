@@ -3,7 +3,7 @@
 # Build
 # ~$ docker build -f docker/Dockerfile -t ghcr.io/usrbinkat/katwalk .
 # 
-# Test/Develop
+# Develop
 # ~$ docker run -it --rm --shm-size=10.24gb -p 8000:8000 --gpus=all -v $HOME/models:/models --entrypoint bash ghcr.io/usrbinkat/katwalk
 # 
 # Run
