@@ -1,0 +1,29 @@
+# This is an encryption salt for securing your stack's secrets.
+encryptionsalt: v1:iIEU2/UmCMY=:v1:65X9iylyO7:OZmfusv7QC3fBHy3bcV6+AthRsPA==
+
+# This is a Pulumi config for the example stack named 'docker'.
+config:
+  # Enable container build
+  katwalk:buildImage: "True"
+
+  katwalk:deploy: "True"           # Enable deploying container
+  katwalk:runtime: docker          # Accepts: 'docker' or 'azure'
+  katwalk:skipImageUpload: "False" # Skip uploading to Docker registry
+
+  # Example local path for model storage if deploying locally with Docker
+  katwalk:modelsPath: /home/kat/models
+
+  # Container Name / Registry settings
+  katwalk:registry: ghcr.io
+  katwalk:username: usrbinkat
+  katwalk:registryNamespace: usrbinkat
+
+  # Container Registry API Token or Password
+  katwalk:password:
+    secure: v1:80f2FIIsIRzQ:72mcpu/vFhdW+f8rNAJHSkej5eF/wHE+FzR/zJb/Alh+24KU=
+
+  # HuggingFace credentials
+  katwalk:hfToken:
+    secure: v1:3NMsFIEeU:1eN1HH1gUDCCLFgwzZGaHZb8G0t4l9y+VHYtbGBLqSSo44NqdNk=
+  katwalk:hfUsername:
+    secure: v1:tYG5DfFcA3V37/:NfPC3oOcutGcTB6wH5YGYV+u4WDPxg==

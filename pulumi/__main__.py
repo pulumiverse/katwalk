@@ -19,8 +19,8 @@ config = pulumi.Config()
 # HuggingFace Settings
 hf_token = config.get_secret("hfToken")
 hf_username = config.require("hfUsername")
-hf_repo = config.get("hfModel") or "meta-llama/Llama-2-7b-chat-hf"
-hf_repo_download_list = config.get("hfModel") or "meta-llama/Llama-2-7b-chat-hf" # this is a placeholder for an un-finished feature of katwalk server
+hf_repo = config.get("hfModel")
+hf_repo_download_list = config.get("hfModelDownloadList") or hf_repo
 
 # Service Deployment Configuration
 deploy_service = config.get_bool("deploy") or False
@@ -33,8 +33,8 @@ image_skip_push = config.get_bool("skipImageUpload") or False # False = Do push 
 # Registry Credentials
 # Used for pull and optionally push
 registry_server = config.get("registry") or "ghcr.io"
-registry_username = config.get("username")
-registry_namespace = config.get("registryNamespace") or "usrbinkat"
+registry_username = config.get("username") or "usrbinkat"
+registry_namespace = config.get("registryNamespace") or registry_username
 
 # Check if image build is enabled, and if push is enabled,
 # and if so load the password from config or abort if not found
@@ -58,7 +58,6 @@ image_name_full = f"{registry_server}/{registry_namespace}/{image_name}:{image_t
 if build_image:
     print("building image")
     image = docker_build(
-        image_name,
         image_platform,
         image_name_full,
         image_skip_push,

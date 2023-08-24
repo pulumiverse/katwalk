@@ -1,5 +1,33 @@
-*.pyc
+# Python files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.env
+.venv
+env/
 venv/
-venv
-Pulumi.*.yaml
-!Pulumi.yaml
+
+# Temporary and backup files
+*.bak
+*.swp
+*.state
+
+# Development environment configurations
+.vscode/
+.idea/
+
+# Logs and databases
+*.log
+*.sqlite
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore build artifacts for containerization (if any)
+build/
+
+# Ignore any sensitive files containing secrets or credentials
+*.secrets
+*.secret

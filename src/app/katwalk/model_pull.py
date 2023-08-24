@@ -1,8 +1,5 @@
 import os
-import sys
-import git
 from git import Repo
-import subprocess
 from git.cmd import Git
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
@@ -51,7 +48,7 @@ def clone_or_update_repo(git_url, destination, username=None, token=None, branch
 
 def main():
     # Read environment variables
-    repos = os.getenv("HF_REPOS")
+    repos = os.getenv("HF_REPOS") or "meta-llama/Llama-2-7b-chat-hf"
     branch = os.getenv("HF_BRANCH", "main")
     username = os.getenv("HF_USER")
     token = os.getenv("HF_TOKEN")

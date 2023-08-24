@@ -1,0 +1,5 @@
+vllm
+torch
+uvicorn
+fastapi
+gitpython

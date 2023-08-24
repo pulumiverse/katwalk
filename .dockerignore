@@ -1,9 +1,0 @@
-.*
-*
-src/katwalk/__pycache__
-!src/*
-!src/*/*
-!src/*/*/*
-!src/*/*/*/*
-!Dockerfile
-!.dockerignore
