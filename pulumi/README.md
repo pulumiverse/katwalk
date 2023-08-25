@@ -78,7 +78,9 @@ pulumi config set --secret hfToken <huggingface_api_token>
 # Set the model that you want to download
 pulumi config set hfModel "meta-llama/Llama-2-7b-chat-hf"
 ```
-# Deploy locally with Docker
+## Deploy locally with Docker
+
+> WARNING: LLM Models can use up 30 to 100 gigabytes of disk space or more!
 
 ```bash
 # This enables the IaC to deploy Katwalk Server
@@ -88,7 +90,25 @@ pulumi config set deploy True
 pulumi config set runtime docker
 
 # (OPTIONAL): set a local directory to store llm model(s)
+# If you do not set this path then Pulumi will fallback to
+# provision and utilize a docker volume for model storage.
 pulumi config set modelsPath /home/kat/models
+
+# Finally, run `pulumi up` to deploy!
+pulumi up
+
+# When done, you can 'destroy' the stack to deprovision your deployment
+pulumi destroy
+```
+
+## Deploy in the cloud on Azure Container Instances
+
+```bash
+# This enables the IaC to deploy Katwalk Server
+pulumi config set deploy True
+
+# Set the deploy runtime to docker to deploy locally
+pulumi config set runtime azure
 
 # Finally, run `pulumi up` to deploy!
 pulumi up
@@ -118,23 +138,17 @@ kip pushing the image to a registry:
 
 pulumi config set skipImageUpload True
 ```
-# Running the container locally defaults to creating and using a Docker Volume to store LLM Models
-# To override this with a local path set the full global path to your chosen directory
-# >>  NOTICE: LLM Models consume 30 to 100 gigabytes of disk space or more!
-# >>          Ensure you have sufficient storage available before proceeding.
 
-
-# To deploy in the cloud on Azure Container Instances
-
-
-# What's Next?
+---------------------------------------------------------------------------
+## What's Next?
 - Adding an API Gateway service?
 - Adding vector database support?
 - Add support for more types of models?
+- https://vercel.com/templates/ai
 - https://github.com/mckaywrigley/chatbot-ui
 - https://medium.com/microsoftazure/custom-chatgpt-with-azure-openai-9bee437ef733
 
-# ADDITIONAL RESOURCES:
+## ADDITIONAL RESOURCES:
 - https://towardsdatascience.com/vllm-pagedattention-for-24x-faster-llm-inference-fdfb1b80f83
 - https://kaitchup.substack.com
 - https://hamel.dev

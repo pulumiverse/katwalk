@@ -112,7 +112,7 @@ elif container_runtime == "azure" and deploy_service == True:
         image_name=image_name,
         image_name_full=image_name_full,
         password=registry_password,
-        location="East US", # You can customize the location if needed
+        location="eastus", # You can customize the location if needed
         resource_group_name=resource_group_name
     )
 

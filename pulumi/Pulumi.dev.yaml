@@ -5,4 +5,4 @@ config:
     secure: v1:q8Vn1opFydKkmA+/:kiJpUBDa3MYfFzDvshH2zw5JlHAWaUH17y55zxXGiWoqCpIE6w1j2ulGu0mdFwybPNYAqng=
   katwalk:hfUsername: usrbinkat
   katwalk:modelsPath: /home/kat/models
-  katwalk:runtime: docker
+  katwalk:runtime: azure
