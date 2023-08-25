@@ -67,7 +67,7 @@ pulumi stack init --stack dev
 ```
 
 
-# Configure required credentials
+## Configure required credentials
 ```bash
 # Set Huggingface.co username
 pulumi config set hfUsername <huggingface_username>

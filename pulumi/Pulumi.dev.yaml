@@ -1,8 +1,15 @@
 encryptionsalt: v1:Ce8NHM69Y40=:v1:j3+XGHCK7R3CZwqp:tv3R4RXUyjj2yAtPvUHTcJKw+G1luA==
 config:
   katwalk:deploy: "True"
+  katwalk:hfModel: meta-llama/Llama-2-7b-chat-hf
   katwalk:hfToken:
     secure: v1:q8Vn1opFydKkmA+/:kiJpUBDa3MYfFzDvshH2zw5JlHAWaUH17y55zxXGiWoqCpIE6w1j2ulGu0mdFwybPNYAqng=
   katwalk:hfUsername: usrbinkat
+  katwalk:imageBuild: "True"
   katwalk:modelsPath: /home/kat/models
+  katwalk:password:
+    secure: v1:GbNi1laZqZt04YiJ:m9KRE1KS1shVVIpDZAN/0AtLxsAwu96UEc4y
+  katwalk:registry: quay.io
+  katwalk:registryNamespace: usrbinkat
   katwalk:runtime: azure
+  katwalk:username: usrbinkat
