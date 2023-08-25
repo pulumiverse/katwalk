@@ -10,7 +10,7 @@ Here you will find all "Infrastructure as Code" artifacts for building Katwalk S
 
 *Models*: currently Katwalk is only tested to run `hf` format models from huggingface repositories.
 
-*Platforms*: linux/amd64 is the architecture tested so far.
+*Platforms*: `linux/amd64` is the architecture tested so far.
 
 Encouragement and or PRs for enhancements are welcome!
 
@@ -28,6 +28,7 @@ Requirements:
 > !NOTE! Access to LLaMa2 via Huggingface is not required if using a non-private model repository. Learn more [HERE](https://huggingface.co/docs/transformers.js/guides/private)
 
 Optional Requirements (must choose one)
+
 * [Docker](https://docs.docker.com/engine/install/)
   * [Nvidia Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
   * [Nvidia CUDA Enabled GPU](https://developer.nvidia.com/cuda-gpus)
@@ -68,6 +69,7 @@ pulumi stack init --stack dev
 
 
 ## Configure required credentials
+
 ```bash
 # Set Huggingface.co username
 pulumi config set hfUsername <huggingface_username>
@@ -78,6 +80,7 @@ pulumi config set --secret hfToken <huggingface_api_token>
 # Set the model that you want to download
 pulumi config set hfModel "meta-llama/Llama-2-7b-chat-hf"
 ```
+
 ## Deploy locally with Docker
 
 > WARNING: LLM Models can use up 30 to 100 gigabytes of disk space or more!
@@ -139,7 +142,7 @@ kip pushing the image to a registry:
 pulumi config set skipImageUpload True
 ```
 
----------------------------------------------------------------------------
+-------------------------------------------------------------------------
 ## What's Next?
 - Adding an API Gateway service?
 - Adding vector database support?
@@ -147,6 +150,7 @@ pulumi config set skipImageUpload True
 - https://vercel.com/templates/ai
 - https://github.com/mckaywrigley/chatbot-ui
 - https://medium.com/microsoftazure/custom-chatgpt-with-azure-openai-9bee437ef733
+- [Container from scratch](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation)?
 
 ## ADDITIONAL RESOURCES:
 - https://towardsdatascience.com/vllm-pagedattention-for-24x-faster-llm-inference-fdfb1b80f83

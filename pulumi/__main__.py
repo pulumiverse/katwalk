@@ -82,11 +82,9 @@ if container_runtime == None or container_runtime == "docker" and deploy_service
     # Run the container
     username = hf_username
     model = hf_repo
-    download_list = hf_repo_download_list
     container_id = docker_run(
         username,
         model,
-        download_list,
         hf_token,
         image_name,
         image_name_full,
@@ -101,13 +99,12 @@ elif container_runtime == "azure" and deploy_service == True:
     models_path = config.get("modelsPath")
     
     # Define the resource group name (if needed)
-    resource_group_name = "myResourceGroup"
+    resource_group_name = image_name
 
     # Call the azure_aci function
     container_name = azure_aci(
         username=hf_username,
         model=hf_repo,
-        download_list=hf_repo_download_list,
         hf_token=hf_token,
         image_name=image_name,
         image_name_full=image_name_full,

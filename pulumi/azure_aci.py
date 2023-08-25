@@ -6,17 +6,17 @@ from pulumi import Output
 def azure_aci(
         username,
         model,
-        download_list,
         hf_token,
         image_name,
         image_name_full,
         password,
         location,
-        resource_group_name="myResourceGroup"
+        resource_group_name,
+        dns_name_label="katwalk"  # This is new - we need a DNS name for the public IP address
     ):
 
-    # Extract the string value of hf_token
-    hf_token_str = Output.from_input(hf_token).apply(lambda token: f"HF_TOKEN={token}")
+    # Extract string values of hf_token and password
+    hf_token_str = Output.from_input(hf_token).apply(lambda token: f"{token}")
     password_str = Output.from_input(password).apply(lambda token: f"{token}")
 
     # Create a resource group
@@ -52,11 +52,19 @@ def azure_aci(
         account_name=storage_account.name
     )
 
-    # Create a container group with GPU-enabled container
+    # Create and expose a container group with a GPU-enabled container
     container_group = aci.ContainerGroup(image_name,
         location=resource_group.location,
         resource_group_name=resource_group.name,
         os_type="Linux",
+        ip_address=aci.IpAddressArgs(
+            ports=[aci.PortArgs(
+                protocol="TCP",
+                port=8000
+            )],
+            type="Public",
+            dns_name_label=dns_name_label,
+        ),
         image_registry_credentials=[aci.ImageRegistryCredentialArgs(
             server="ghcr.io",
             username=username,
@@ -67,7 +75,7 @@ def azure_aci(
             azure_file=aci.AzureFileVolumeArgs(
                 share_name=file_share.name,
                 storage_account_name=storage_account.name,
-                storage_account_key=primary_access_key
+                storage_account_key=primary_access_key,
             )
         )],
         containers=[aci.ContainerArgs(
@@ -75,22 +83,21 @@ def azure_aci(
             image=image_name_full,
             resources=aci.ResourceRequirementsArgs(
                 requests=aci.ResourceRequestsArgs(
-                    cpu=2.0,
-                    memory_in_gb=4,
-                    gpu=aci.GpuResourceArgs(count=1, sku="V100") # Requesting 1 GPU
+                    cpu=3.0,
+                    memory_in_gb=12,
+                    gpu=aci.GpuResourceArgs(count=1, sku="V100")  # Requesting 1 GPU
                 ),
                 limits=aci.ResourceLimitsArgs(
-                    gpu=aci.GpuResourceArgs(count=1, sku="V100") # Limiting to 1 GPU
+                    gpu=aci.GpuResourceArgs(count=1, sku="V100")  # Limiting to 1 GPU
                 ),
             ),
             environment_variables=[
                 {"name": "REFRESH_REPOSITORIES", "value": "True"},
                 {"name": "HF_USER", "value": username},
                 {"name": "HF_REPO", "value": model},
-                {"name": "HF_REPOS", "value": download_list},
                 {"name": "HF_TOKEN", "value": hf_token_str},
             ],
-            command=["python3", "/katwalk/main.py"],
+            command=["python", "main.py"],
             ports=[aci.ContainerPortArgs(
                 port=8000,
                 protocol="TCP"

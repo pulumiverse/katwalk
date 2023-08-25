@@ -4,10 +4,10 @@ from pulumi import Output
 from pulumi_docker import Container, ContainerPortArgs, ContainerMountArgs, Volume
 
 # Run a Docker container locally
-def docker_run(username, model, download_list, hf_token, image_name, image_name_full, models_path):
+def docker_run(username, model, hf_token, image_name, image_name_full, models_path):
 
     # Extract the string value of hf_token
-    hf_token_str = Output.from_input(hf_token).apply(lambda token: f"HF_TOKEN={token}")
+    hf_token_str = Output.from_input(hf_token).apply(lambda token: f"{token}")
 
     # Determine mount_type and create a Docker volume if a path is not provided
     if models_path is None:
@@ -25,8 +25,7 @@ def docker_run(username, model, download_list, hf_token, image_name, image_name_
             "REFRESH_REPOSITORIES=True",
             f"HF_USER={username}",
             f"HF_REPO={model}",
-            f"HF_REPOS={download_list}",
-            hf_token_str
+            f"HF_TOKEN={hf_token_str}",
         ],  # Set environment variables
         gpus="all",  # Equivalent of --gpus=all
         mounts=[
@@ -37,7 +36,7 @@ def docker_run(username, model, download_list, hf_token, image_name, image_name_
                 type=mount_type
             )
         ],
-        command=["python3", "/katwalk/main.py"],
+        command=["python", "main.py"],
         attach=False,
         hostname="katwalk",  # Set hostname of container
         shm_size=10 * 1024 * 1024 * 1024  # Convert GBs to Bytes and set shared memory size

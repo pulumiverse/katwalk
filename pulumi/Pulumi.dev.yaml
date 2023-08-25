@@ -8,7 +8,7 @@ config:
   katwalk:imageBuild: "True"
   katwalk:modelsPath: /home/kat/models
   katwalk:password:
-    secure: v1:GbNi1laZqZt04YiJ:m9KRE1KS1shVVIpDZAN/0AtLxsAwu96UEc4y
+    secure: v1:D+r3yKnujO4u9Ow0:6oYqY31Frr7haHTCXaGkYPCCIIBmM+sgVmxV
   katwalk:registry: quay.io
   katwalk:registryNamespace: usrbinkat
   katwalk:runtime: azure
