@@ -6,6 +6,7 @@ import pulumi
 # Import local libraries
 from image_build import docker_build
 from docker_run import docker_run
+import runpod_provider
 
 # `None` variable defaults
 models_path = None
@@ -95,8 +96,22 @@ if container_runtime == None or container_runtime == "docker" and deploy_service
 elif container_runtime == "azure" and deploy_service == True:
     print("Running container in the cloud with Azure Container Instances...")
 
-elif deploy_service == True and container_runtime != None and container_runtime != "docker" and container_runtime != "azure":
-    raise ValueError(f"\n\nContainer runtime '{container_runtime}' is not supported.\nPlease set 'runtime' to 'docker' or 'azure'.\n")
+elif container_runtime == "runpod" and deploy_service == True:
+    print("Running container in the cloud with Runpod.io...")
+
+    # Run the pod
+    container_id = runpod_provider.RunPod(
+        "test", 
+        runpod_provider.RunPodArgs(
+            "test", 
+            image_name_full, 
+            "NVIDIA GeForce RTX 3070"
+        )
+    )
+
+
+elif deploy_service == True and container_runtime != None and container_runtime not in ["docker","azure","runpod"]:
+    raise ValueError(f"\n\nContainer runtime '{container_runtime}' is not supported.\nPlease set 'runtime' to 'docker', 'azure' or 'runpod'.\n")
 
 # Stack exports
 pulumi.export("containerBuildImage", image_name_full)

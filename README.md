@@ -19,90 +19,106 @@ kat@cuda:~$ curl -s -X 'POST' 'http://localhost:8000/v1/chat' -H 'accept: applic
 }
 ```
 
-# How To
+## How To
 
-```
-# By default this IaC will not build or deploy anything. 
 
-# To prepare your Pulumi stack, run the following commands:
+By default this IaC will not build or deploy anything.
 
-   1. gh repo clone usrbinkat/katwalk && cd katwalk
-   2. python3 -m venv venv
-   3. source venv/bin/activate
-   4. python -m pip install --upgrade pip setuptools wheel
-   5. python -m pip install -r requirements.txt
-   6. pulumi login file://~/.pulumi/state
-   7. pulumi stack init
+To prepare your Pulumi stack, run the following commands:
 
-# To deploy locally on Docker
+   1. `gh repo clone usrbinkat/katwalk && cd katwalk`
+   1. `python3 -m venv venv`
+   1. `source venv/bin/activate`
+   1. `python -m pip install --upgrade pip setuptools wheel`
+   1. `python -m pip install -r requirements.txt`
+   1. `pulumi login file://~/.pulumi/state`
+   1. `pulumi stack init`
 
-   8. pulumi config set deploy True
+To deploy locally on Docker
 
-# Running the container locally defaults to creating and using a Docker Volume to store LLM Models
-# To override this with a local path set the full global path to your chosen directory
-# >>  NOTICE: LLM Models consume 30 to 100 gigabytes of disk space or more!
-# >>          Ensure you have sufficient storage available before proceeding.
+   8. `pulumi config set deploy True`
 
-   8. pulumi config set modelsPath /GLOBAL/PATH/TO/DIRECTORY
+Running the container locally defaults to creating and using a Docker Volume to store LLM Models
+To override this with a local path set the full global path to your chosen directory
 
-# To deploy in the cloud on Azure Container Instances
+>>  NOTICE: LLM Models consume 30 to 100 gigabytes of disk space or more!
+>>          Ensure you have sufficient storage available before proceeding.
 
-   8. pulumi config set runtime azure
+   9. `pulumi config set modelsPath /GLOBAL/PATH/TO/DIRECTORY`
 
-# To build the image:
+To deploy in the cloud on Azure Container Instances
 
-   9. pulumi config set imageBuild True # Defaults to False
-  10. pulumi config set registry ghcr.io
-  11. pulumi config set registryNamespace $NAMESPACE # this may be the same as your username
-  12. pulumi config set password --secret <registry_password_or_api_token>
-  13. pulumi config set username $USERNAME
+   8. `pulumi config set runtime azure`
 
-# To skip pushing the image to a registry:
+To deploy in the cloud on Runpod.io
 
-  14. pulumi config set skipImageUpload True
+   8. Configure the Runpod provider
+      a. `pulumi config set runtime runpod`
 
-# To authenticate with huggingface.co to download llm model(s)
+To build the image:
 
-  15. pulumi config set --secret hfToken <huggingface_api_token>
+  9. `pulumi config set imageBuild True` (Defaults to False)
+  9. `pulumi config set registry ghcr.io`
+  9. `pulumi config set registryNamespace $NAMESPACE` (this may be the same as your username)
+  9. `pulumi config set password --secret` (Paste your registry password or api token at the `value:` prompt)
+  9. `pulumi config set username $USERNAME`
+
+To skip pushing the image to a registry:
+
+  14. `pulumi config set skipImageUpload True`
+
+To authenticate with huggingface.co to download llm model(s)
+
+  15. `pulumi config set --secret hfToken` (Paste your huggingface api token at the `value:` prompt)
 
 Finally, run `pulumi up` to build, publish, and deploy as per your config settings!
 
 When you are done, run `pulumi destroy` to deprovision your katwalk service.
-```
 
-# What's Next?
+## What's Next?
+
 - Adding an API Gateway service?
 - Adding vector database support?
 - Add support for more types of models?
 - https://github.com/mckaywrigley/chatbot-ui
 - https://medium.com/microsoftazure/custom-chatgpt-with-azure-openai-9bee437ef733
 
-# ADDITIONAL RESOURCES:
+## ADDITIONAL RESOURCES:
+
 - https://towardsdatascience.com/vllm-pagedattention-for-24x-faster-llm-inference-fdfb1b80f83
 - https://kaitchup.substack.com
 - https://hamel.dev
 - https://github.com/michaelthwan/llm_family_chart/blob/master/2023_LLMfamily.drawio.png
 - https://kaiokendev.github.io/context
+- [Runpod Python API client library](https://github.com/runpod/runpod-python)
 
-# Configuration Index
+## Configuration Index
+
+### Global Settings
+
 ```
-# Global Settings
 deploy_service = True/False whether to deploy the katwalk server or not (optional)
 container_runtime = defaults to docker (supported: azure / docker)
+```
+### Katwalk Server Container Image Build Settings
 
-# Katwalk Server Container Image Build Settings
+```
 build_image = True/False aka: whether to build the image yourself (optional)
 image_skip_push = True/False aka: this bool is backwards due to pulumi provider
 registry_server = default: ghcr.io aka which container registry to push image to
 registry_username = user account for the container registry
 registry_namespace = project or namespace the container image should push to, may be same as registry_username
+```
+### HuggingFace
 
-# HuggingFace
+```
 hfToken = api authentication token
 hfUsername = username
 hfModel = $publisher/$model name of the model aka repository that you want
+```
+### Docker Runtime (if running locally)
 
-# Docker Runtime (if running locally)
+```
 models_path = global path to local model storage directory (optional)
 registry_password = katwalk container image registry auth token or password
 ```
