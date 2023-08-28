@@ -1,5 +1,6 @@
 vllm
 torch
+runpod
 uvicorn
 fastapi
 gitpython

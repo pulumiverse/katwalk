@@ -4,7 +4,7 @@ from pulumi import Output
 from pulumi_docker import Container, ContainerPortArgs, ContainerMountArgs, Volume
 
 # Run a Docker container locally
-def docker_run(username, model, hf_token, image_name, image_name_full, models_path):
+def docker_run(hf_username, hf_repo, hf_token, image_name, image_name_full, models_path):
 
     # Extract the string value of hf_token
     hf_token_str = Output.from_input(hf_token).apply(lambda token: f"{token}")
@@ -23,8 +23,8 @@ def docker_run(username, model, hf_token, image_name, image_name_full, models_pa
         ports=[ContainerPortArgs(internal=8000, external=8000)],  # Expose port 8000
         envs=[
             "REFRESH_REPOSITORIES=True",
-            f"HF_USER={username}",
-            f"HF_REPO={model}",
+            f"HF_USER={hf_username}",
+            f"HF_REPO={hf_repo}",
             f"HF_TOKEN={hf_token_str}",
         ],  # Set environment variables
         gpus="all",  # Equivalent of --gpus=all

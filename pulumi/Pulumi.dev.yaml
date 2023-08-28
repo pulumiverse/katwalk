@@ -1,7 +1,9 @@
 encryptionsalt: v1:Ce8NHM69Y40=:v1:j3+XGHCK7R3CZwqp:tv3R4RXUyjj2yAtPvUHTcJKw+G1luA==
 config:
+  katwalk:buildImage: "False"
   katwalk:deploy: "True"
   katwalk:hfModel: meta-llama/Llama-2-7b-chat-hf
+  #katwalk:hfModel: TheBloke/WizardCoder-Guanaco-15B-V1.0-GPTQ
   katwalk:hfToken:
     secure: v1:q8Vn1opFydKkmA+/:kiJpUBDa3MYfFzDvshH2zw5JlHAWaUH17y55zxXGiWoqCpIE6w1j2ulGu0mdFwybPNYAqng=
   katwalk:hfUsername: usrbinkat
@@ -11,5 +13,8 @@ config:
     secure: v1:D+r3yKnujO4u9Ow0:6oYqY31Frr7haHTCXaGkYPCCIIBmM+sgVmxV
   katwalk:registry: quay.io
   katwalk:registryNamespace: usrbinkat
-  katwalk:runtime: azure
+  katwalk:runpodToken:
+    secure: v1:BbM0stNMeN2F1zpJ:gK0i4dY5/7xCEiyuZXkBlc87LMNieC1gcXmPZRUz4bVaR7vMKiacX5wLQIUtv4MHKK+p/dQCFfs=
+  katwalk:runpodTokenPlainText: QMU2GPIZR6XPERFQ1SR28TJRVLQXUYXRX246BIGX
+  katwalk:runtime: runpod
   katwalk:username: usrbinkat

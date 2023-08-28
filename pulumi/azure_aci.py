@@ -12,7 +12,7 @@ def azure_aci(
         password,
         location,
         resource_group_name,
-        dns_name_label="katwalk"  # This is new - we need a DNS name for the public IP address
+        dns_name_label="katwalk"
     ):
 
     # Extract string values of hf_token and password
@@ -83,8 +83,8 @@ def azure_aci(
             image=image_name_full,
             resources=aci.ResourceRequirementsArgs(
                 requests=aci.ResourceRequestsArgs(
-                    cpu=3.0,
-                    memory_in_gb=12,
+                    cpu=4.0,
+                    memory_in_gb=16,
                     gpu=aci.GpuResourceArgs(count=1, sku="V100")  # Requesting 1 GPU
                 ),
                 limits=aci.ResourceLimitsArgs(
