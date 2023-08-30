@@ -45,7 +45,7 @@ config_container_runtime = config.get("runtime") or "docker" # Default to docker
 if config_deploy_service == True:
     # HuggingFace Settings
     config_hf_model_id = config.get("hfModel") or "meta-llama/Llama-2-7b-chat-hf"
-    config_hf_user = config.require("hfUser")
+    config_hf_user = config.require("hfUsername")
     config_hf_token = config.require_secret("hfToken")
     # Incomplete feature to allow multiple models to be downloaded
     config_hf_model_id_download_list = config.get("hfModelDownloadList") or config_hf_model_id
