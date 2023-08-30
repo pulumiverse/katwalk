@@ -1,49 +1,64 @@
 # secret encryption salt
 encryptionsalt: v1:Ce8NM940=:v1:j+XGC73Zqp:t34XyjytvHcK+G1luA==
 config:
-  #################################################################
-  # Azure Deploy Settings
-  #################################################################
-  katwalk:azureAciGpu: "V100" # accepts: V100, K80, P100
-  katwalk:azureAciGpuCount: "1" # accepts: 1, 2, 4, 8
+
   #################################################################
   # General Deploy config
   #################################################################
+
   katwalk:deploy: "True" # Default: False, set to "True" to deploy
   katwalk:runtime: "runpod" # Default: docker, accepts: docker, runpod, azure
   katwalk:deploymentName: "katwalk" # Defaults to "katwalk"
+
   #################################################################
   # Docker Image Settings
   #################################################################
+
   # Docker Build & Push Settings
   katwalk:dockerBuild: "False" # Default: False, set to "True" to build container
   katwalk:dockerPush: "False" # Default: False, set to "True" to push container
+
   # Docker Image Name & Registry Settings
   katwalk:dockerTag: "20230829"
   katwalk:dockerName: "katwalk"
   katwalk:dockerProject: "usrbinkat" # Optional if same as dockerUser
   katwalk:dockerRegistry: "ghcr.io" # accepts: any oci registry service (e.g. ghcr.io, docker.io, etc.)
+
   # Registry Credentials
   katwalk:dockerUser: "usrbinkat"
+
   # Optional unless pushing to registry or deploying to Azure
   katwalk:dockerRegistrySecret: # accepts: oci registry api token or password as `pulumi config set --secret dockerRegistrySecret <token>`
     secure: v1:UUt+00x+9Tz1:IVMKQ/2J+5ydq5R/kuFlfp+v5yYDF8HcL3Vy9Vz8nTNKPU=
+
   #################################################################
   # Huggingface Settings
   #################################################################
+
   # Huggingface Model ID string
   katwalk:hfModel: "meta-llama/Llama-2-7b-chat-hf" # accepts: any `hf` format Huggingface model ID
+
   # Huggingface Credentials
   katwalk:hfUser: "usrbinkat" # accepts: Huggingface user name
   katwalk:hfToken: # accepts: Huggingface API auth token as `pulumi config set --secret hfToken <token>`
     secure: v1:5hwLBQ4KO:/DNzuZ7UfbMMOQGxF7d29a+nWm04YSspPDm11y79E=
+
   #################################################################
   # Docker Deploy Settings
   #################################################################
+
   # If deploying locally via Docker
   # Default: create & use docker volume
   # Optional: set global local host path to models directory
   katwalk:modelsPath: /home/kat/models
+
+  #################################################################
+  # Azure Deploy Settings
+  #################################################################
+
+  katwalk:azureAciGpu: "V100" # accepts: V100, K80, P100
+  katwalk:azureAciGpuCount: "1" # accepts: 1, 2, 4, 8
+
   #################################################################
   # Runpod Deploy Settings
   #################################################################
