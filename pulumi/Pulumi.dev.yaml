@@ -1,12 +1,6 @@
 # secret encryption salt
 encryptionsalt: v1:Ce8NM940=:v1:j+XGC73Zqp:t34XyjytvHcK+G1luA==
 config:
-  #################################################################
-  # Azure Deploy Settings
-  #################################################################
-
-  katwalk:azureAciGpu: "V100" # accepts: V100, K80, P100
-  katwalk:azureAciGpuCount: "1" # accepts: 1, 2, 4, 8
 
   #################################################################
   # General Deploy config
@@ -57,6 +51,13 @@ config:
   # Default: create & use docker volume
   # Optional: set global local host path to models directory
   katwalk:modelsPath: /home/kat/models
+
+  #################################################################
+  # Azure Deploy Settings
+  #################################################################
+
+  katwalk:azureAciGpu: "V100" # accepts: V100, K80, P100
+  katwalk:azureAciGpuCount: "1" # accepts: 1, 2, 4, 8
 
   #################################################################
   # Runpod Deploy Settings
