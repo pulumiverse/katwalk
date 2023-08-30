@@ -55,7 +55,7 @@ RUN set -ex \
 # Install Python package vllm as it's own layer
 RUN set -ex \
     && python --version \
-    && python -m pip install --no-cache-dir git+https://github.com/usrbinkat/vllm-gptq@gptq \
+    && python -m pip install --no-cache-dir git+https://github.com/chu-tianxiang/vllm-gptq@gptq \
     && rm -rf \
         /var/lib/{apt,dpkg,cache,log} \
         /usr/share/{doc,man,locale} \

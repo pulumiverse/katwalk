@@ -2,7 +2,6 @@
 from typing import Optional, Dict, List
 from pulumi import Input, Output, ResourceOptions
 from pulumi.dynamic import Resource, CreateResult, DiffResult, ResourceProvider
-import logging
 import runpod # Import the custom runpod module
 
 # Define a class to hold the arguments for running a pod
@@ -15,10 +14,10 @@ class RunPodArgs:
             gpu_count: Input[int] = None,
             container_disk: Input[int] = None,
             volume_disk: Input[int] = None,
+            cloud_type: Input[str] = None,
             mounts: Input[List[Dict[str, str]]] = None,
             ports: Input[List[int]] = None,
-            env: Input[Dict[str, str]] = None,
-            cloud_type: Input[str] = None
+            env: Input[Dict[str, str]] = None
         ):
         # Initialize all the properties for running a pod
         self.name = name
@@ -28,10 +27,10 @@ class RunPodArgs:
         self.gpu_count = gpu_count
         self.container_disk = container_disk
         self.volume_disk = volume_disk
+        self.cloud_type = cloud_type
         self.mounts = mounts
         self.ports = ports
         self.env = env
-        self.cloud_type = cloud_type
 
 # Define the main RunPod class that inherits from Pulumi's Resource class
 class RunPod(Resource):
@@ -46,8 +45,8 @@ class RunPod(Resource):
 class RunPodProvider(ResourceProvider):
     # Define the create method to handle pod creation
     def create(self, props):
-        print(f"Creating pod with properties: {props}")
-        
+        print(f"Deploying to Runpod.io with Dynamic Provider ...")
+
         # Check if 'api_key' is present in properties, raise an error if not
         if 'api_key' not in props:
             raise ValueError("Missing 'api_key'. This field is required.")
@@ -63,20 +62,20 @@ class RunPodProvider(ResourceProvider):
             cloud_type=props.get('cloud_type', 'ALL'),
             gpu_count=props.get('gpu_count', 1),
             volume_in_gb=props.get('volume_disk', 0),
-            container_disk_in_gb=props.get('container_disk', 5),
+            container_disk_in_gb=props.get('container_disk', 16),
             ports=props.get('ports'),
             volume_mount_path=props.get('mounts'),
             env=props.get('env')
         )
         
-        print(f"Pod created successfully: {result}")
+        print(f"Pod created successfully ...")
         
         # Return a CreateResult object with the ID and output properties
         return CreateResult(id_=result['id'], outs={**result, 'api_key': props['api_key']})
 
     # Define the delete method to handle pod deletion
     def delete(self, id, props):
-        print(f"Terminate Properties: {props}")
+        print(f"Terminate pod with ID: {id}")
         
         # Check if 'api_key' is present in properties, raise an error if not
         if 'api_key' not in props:
@@ -90,11 +89,10 @@ class RunPodProvider(ResourceProvider):
         
         try:
             print(f"Terminating Pod: {id}")
-            result = runpod.terminate_pod(id)
+            result = runpod.terminate_pod(id, props) # TODO: Fix pod not deleting
             print(f"Pod terminated successfully: {result}")
         #except runpod.error.QueryError as e:
         #    print(f"GraphQL Query Error: {e}")
-        #    logging.error(f"API Error: {e}")
         #    raise
         except:
             return
@@ -104,7 +102,6 @@ class RunPodProvider(ResourceProvider):
         #    pod_ids = [pod['id'] for pod in all_pods]
         #except runpod.error.QueryError as e:
         #    print(f"GraphQL Query Error: {e}")
-        #    logging.error(f"API Error: {e}")
         #    raise
         
         ## Terminate the pod if it exists

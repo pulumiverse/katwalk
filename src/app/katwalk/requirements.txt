@@ -3,4 +3,5 @@ torch
 runpod
 uvicorn
 fastapi
+auto_gptq
 gitpython
