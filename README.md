@@ -1,12 +1,12 @@
-# KatWalk Server - LLM API Server and IaC
+# Katwalk Server - LLM API Server and IaC
 
 > This repository is under construction.    
 > Encouragement and or Bugs & PRs for enhancement are welcome!
 
 ## About:
 
-Katwalk is an llm model api server.    
-In this repository you will find all code required to build a containerized LLM API service and deploy.
+Katwalk is a LLM model api server.    
+In this repository you will find all code required to build and deploy a containerized LLM API service.
 
 ## Deployment options:
 - Locally with Docker
