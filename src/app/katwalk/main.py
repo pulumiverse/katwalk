@@ -5,12 +5,22 @@ import re
 import torch
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from vllm import LLM, SamplingParams
 import model_pull
 
 MODEL_DIR = "/models"
 app = FastAPI()
+
+# Configure CORS to allow all origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can specify specific origins if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Create an instance of the LLM class using the model directory
 # Read environment variables
