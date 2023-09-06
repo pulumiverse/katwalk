@@ -19,20 +19,20 @@ def create_pod(
         ports,  # Ports to publish
         env  # Environment variables
     ):
-    print("[./runpod/pod.py=azure_aci] Deploying container in the cloud with Runpod.io ...")
+    print("Deploying container in the cloud with Runpod.io ...")
 
     # Authenticate with the API key
     #runpod.api_key = config_rp_token.apply(lambda token: f"{token}")
     config_rp_token.apply(lambda token: setattr(runpod, 'api_key', token))
-    
+
     # Create a new RunPod object and return it
     # The RunPod object is initialized with the 'name' and a RunPodArgs object
     # The RunPodArgs object is initialized with all the function arguments
     return RunPod(
-        project_name, 
+        project_name,
         RunPodArgs(
-            name=project_name, 
-            image_name=config_docker_name_full, 
+            name=project_name,
+            image_name=config_docker_name_full,
             api_key=config_rp_token.apply(lambda token: f"{token}"),
             gpu=config_rp_gpu_type,
             #gpu_count=config_rp_gpu_count
