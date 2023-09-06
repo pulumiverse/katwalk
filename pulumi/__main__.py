@@ -105,6 +105,9 @@ if config_docker_build:
         docker_dockerfile_path
     )
 
+    # export container image name
+    pulumi.export("containerBuildImage", config_docker_name_full)
+
 
 #############################################################
 # Deploy Service if enabled
@@ -119,7 +122,7 @@ if config_deploy_service and config_container_runtime == "docker":
     # Set config_docker_hostdir to user provided path
     # else if None, default provision/use local docker volume
     config_docker_hostdir = config.get("modelsPath")
-    
+
     # Run the container
     container_id = docker_run(
         project_name,
@@ -135,7 +138,7 @@ if config_deploy_service and config_container_runtime == "docker":
 # Runtime=azure platform
 if config_deploy_service and config_container_runtime == "azure":
     print("Generating Azure ACI Deployment ...")
-    
+
     # Load GPU settings from Pulumi config or default to 1 x V100
     config_azure_aci_gpu = config.get("azureAciGpu") or "V100"
     config_azure_aci_gpu_count = config.get_int("azureAciGpuCount") or 1
@@ -165,19 +168,23 @@ if config_deploy_service and config_container_runtime == "azure":
 if config_deploy_service and config_container_runtime == "runpod":
     print("Generating Runpod.io Deployment ...")
 
+    # Define a function to format the URL
+    def format_url(id):
+        return f"https://{id}-8000.proxy.runpod.net/v1/chat"
+
     # Require Runpod.io Token if deploy_service=True
     config_rp_token = config.require_secret("runpodToken") # Get Runpod token as a secret
-    
+
     config_rp_gpu_type = config.get("runpodGpuType") or "NVIDIA RTX A6000" # Specify the type of GPU to use
     config_rp_gpu_count = str(config.get("runpodGpuCount")) or "1" # Specify the number of GPUs to allocate
-    
+
     # Specify the type of cloud to deploy on
     config_rp_cloud_type = "secure cloud"
-    
+
     # Set container and volume disk size for the volume in GB
     config_rp_container_disk_size_gb = "16"
     config_rp_volume_disk_size_gb = "80"
-    
+
     # Define environment variables for the container
     env = {
         # HuggingFace Credentials
@@ -191,7 +198,7 @@ if config_deploy_service and config_container_runtime == "runpod":
     mounts="/models"
     ports="8000/http" # valid format - "8888/http,666/tcp"
     env=env
-    
+
     # Call the 'create_pod' function from the 'rp' module to create the container
     # Store the returned container ID
     container_id = create_pod(
@@ -207,10 +214,11 @@ if config_deploy_service and config_container_runtime == "runpod":
         ports,
         env
     )
-    
-    # Export the container ID using Pulumi's export function
-    pulumi.export("container_id", container_id.id)
 
+    # Export the container ID using Pulumi's export function
+    runpod_id_fqdn = container_id.id.apply(format_url)
+    pulumi.export("container_id", container_id.id)
+    pulumi.export("ChatbotURL", runpod_id_fqdn)
 
 #############################################################
 # Error Handling
@@ -220,15 +228,3 @@ if config_deploy_service and config_container_runtime == "runpod":
 # or if config_container_runtime is specified but not supported, throw an error
 if config_deploy_service and config_container_runtime not in ['docker', 'azure', 'runpod']:
     raise ValueError(f"\n\nContainer runtime '{config_container_runtime}' is not supported.\nPlease set 'runtime' to 'docker', 'azure', or 'runpod'.\n")
-
-
-#############################################################
-# Stack Exports
-#############################################################
-
-# Stack exports
-pulumi.export("containerBuildImage", config_docker_name_full)
-if config_deploy_service == True:
-    pulumi.export("containerRuntime", config_container_runtime)
-    if config_container_runtime == "runpod":
-        pulumi.export("containerId", container_id.id)

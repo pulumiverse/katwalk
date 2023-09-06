@@ -36,7 +36,7 @@ class RunPodArgs:
 class RunPod(Resource):
     container_id: Output[str]
     api_key: Output[str]
-    
+
     def __init__(self, name: str, args: RunPodArgs, opts: Optional[ResourceOptions] = None):
         # Initialize the parent class with the RunPodProvider, name, properties, and options
         super().__init__(RunPodProvider(), name, {'container_id': None, 'api_key': args.api_key, **vars(args)}, opts)
@@ -45,15 +45,15 @@ class RunPod(Resource):
 class RunPodProvider(ResourceProvider):
     # Define the create method to handle pod creation
     def create(self, props):
-        print(f"Deploying to Runpod.io with Dynamic Provider ...")
+        print(f"Starting Runpod.io Dynamic Provider ...")
 
         # Check if 'api_key' is present in properties, raise an error if not
         if 'api_key' not in props:
             raise ValueError("Missing 'api_key'. This field is required.")
-        
+
         # Set the API key for the runpod module
         runpod.api_key = props['api_key']
-        
+
         # Call the create_pod method from the runpod module and store the result
         result = runpod.create_pod(
             name=props['name'],
@@ -67,26 +67,23 @@ class RunPodProvider(ResourceProvider):
             volume_mount_path=props.get('mounts'),
             env=props.get('env')
         )
-        
-        print(f"Pod created successfully ...")
-        
+
         # Return a CreateResult object with the ID and output properties
         return CreateResult(id_=result['id'], outs={**result, 'api_key': props['api_key']})
 
     # Define the delete method to handle pod deletion
     def delete(self, id, props):
-        print(f"Terminate pod with ID: {id}")
-        
+
         # Check if 'api_key' is present in properties, raise an error if not
         if 'api_key' not in props:
             raise ValueError("Missing 'api_key'. This field is required.")
-        
+
         # Set the API key for the runpod module
         runpod.api_key = props['api_key']
-        
+
         # Initialize an empty list to hold pod IDs
         pod_ids = []
-        
+
         try:
             print(f"Terminating Pod: {id}")
             result = runpod.terminate_pod(id, props) # TODO: Fix pod not deleting
@@ -103,7 +100,7 @@ class RunPodProvider(ResourceProvider):
         #except runpod.error.QueryError as e:
         #    print(f"GraphQL Query Error: {e}")
         #    raise
-        
+
         ## Terminate the pod if it exists
         #if id in pod_ids:
         #    print(f"Pod ID {id} found...terminating pod..")
@@ -121,9 +118,9 @@ class RunPodProvider(ResourceProvider):
     # Define the update method to handle pod updates
     def update(self, id, olds, news):
         print(f"Updating pod with ID: {id}")
-        
+
         # Delete the old pod
         self.delete(id, olds)
-        
+
         # Create a new pod with the new properties
         return self.create(news)
