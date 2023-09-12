@@ -6,3 +6,4 @@ pulumi-azure
 pulumi>=3.0.0,<4.0.0
 pulumi-docker>=3.0.0
 pulumi-azure-native>=1.0.0
+pulumiverse-vercel

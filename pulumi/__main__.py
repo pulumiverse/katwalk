@@ -13,6 +13,7 @@ import sys
 
 # Import Pulumi libraries
 import pulumi
+import pulumiverse_vercel as vercel
 from pulumi import Output
 
 # Add parent directory to sys.path to import local modules
@@ -220,6 +221,51 @@ if config_deploy_service and config_container_runtime == "runpod":
     pulumi.export("container_id", container_id.id)
     pulumi.export("ChatbotURL", runpod_id_fqdn)
 
+#############################################################
+# FRONTEND INFRASTRUCTURE
+#############################################################
+
+config_deploy_vercel = config.get_bool("deployVercel") or False # (Bool) Default: do not deploy frontend
+if config_deploy_vercel:
+    vclToken = config.require_secret("vclToken")
+    gitRepoName = config.require("gitRepoName")
+    gitRepoType = config.require("gitRepoType")
+
+    provider = vercel.Provider("vercel-provider",
+        api_token = vclToken
+    )
+
+    project = vercel.Project("vercel-project",
+        name = "vercel-git-project",
+        framework = "vue",
+        git_repository = vercel.ProjectGitRepositoryArgs(
+            repo = gitRepoName,
+            type = gitRepoType
+        ),
+        root_directory = "src/app/katwalk-frontend",
+        opts = pulumi.ResourceOptions(
+            provider = provider
+        )
+    )
+
+    environment = vercel.ProjectEnvironmentVariable("vercel-env",
+        project_id = project.id,
+        key = "VUE_APP_BACKEND_DNS",
+        value = runpod_id_fqdn,
+        targets = ["production"],
+        opts = pulumi.ResourceOptions(
+            provider = provider
+        )
+    )
+
+    deployment = vercel.Deployment("vercel-deployment",
+        project_id = project.id,
+        production = True,
+        ref = "main",
+        opts = pulumi.ResourceOptions(
+            provider = provider
+        )
+    )
 #############################################################
 # Error Handling
 #############################################################
