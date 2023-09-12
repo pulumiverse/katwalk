@@ -37,9 +37,6 @@ config_docker_hostdir = None
 # Load config settings from `pulumi config set` user commands
 config = pulumi.Config()
 project_name = config.get("deploymentName") or "katwalk"
-vclToken = config.require_secret("vclToken")
-gitRepoName = config.require("gitRepoName")
-gitRepoType = config.require("gitRepoType")
 
 # Service Deployment Configuration
 config_deploy_service = config.get_bool("deploy") or False # Default: do not deploy service
@@ -225,6 +222,51 @@ if config_deploy_service and config_container_runtime == "runpod":
     pulumi.export("ChatbotURL", runpod_id_fqdn)
 
 #############################################################
+# FRONTEND INFRASTRUCTURE
+#############################################################
+
+config_deploy_vercel = config.get_bool("deployVercel") or False # (Bool) Default: do not deploy frontend
+if config_deploy_vercel:
+    vclToken = config.require_secret("vclToken")
+    gitRepoName = config.require("gitRepoName")
+    gitRepoType = config.require("gitRepoType")
+
+    provider = vercel.Provider("vercel-provider",
+        api_token = vclToken
+    )
+
+    project = vercel.Project("vercel-project",
+        name = "vercel-git-project",
+        framework = "vue",
+        git_repository = vercel.ProjectGitRepositoryArgs(
+            repo = gitRepoName,
+            type = gitRepoType
+        ),
+        root_directory = "src/app/katwalk-frontend",
+        opts = pulumi.ResourceOptions(
+            provider = provider
+        )
+    )
+
+    environment = vercel.ProjectEnvironmentVariable("vercel-env",
+        project_id = project.id,
+        key = "VUE_APP_BACKEND_DNS",
+        value = runpod_id_fqdn,
+        targets = ["production"],
+        opts = pulumi.ResourceOptions(
+            provider = provider
+        )
+    )
+
+    deployment = vercel.Deployment("vercel-deployment",
+        project_id = project.id,
+        production = True,
+        ref = "main",
+        opts = pulumi.ResourceOptions(
+            provider = provider
+        )
+    )
+#############################################################
 # Error Handling
 #############################################################
 
@@ -232,44 +274,3 @@ if config_deploy_service and config_container_runtime == "runpod":
 # or if config_container_runtime is specified but not supported, throw an error
 if config_deploy_service and config_container_runtime not in ['docker', 'azure', 'runpod']:
     raise ValueError(f"\n\nContainer runtime '{config_container_runtime}' is not supported.\nPlease set 'runtime' to 'docker', 'azure', or 'runpod'.\n")
-
-
-#############################################################
-# FRONTEND INFRASTRUCTURE
-#############################################################
-
-provider = vercel.Provider("vercel-provider",
-    api_token = vclToken
-)
-
-project = vercel.Project("vercel-project", 
-    name = "vercel-git-project",
-    framework = "vue",
-    git_repository = vercel.ProjectGitRepositoryArgs(
-        repo = gitRepoName,
-        type = gitRepoType
-    ),
-    root_directory = "src/app/katwalk-frontend",
-    opts = pulumi.ResourceOptions(
-        provider = provider
-    )
-)
-
-environment = vercel.ProjectEnvironmentVariable("vercel-env",
-    project_id = project.id,
-    key = "VUE_APP_BACKEND_DNS",
-    value = runpod_id_fqdn,
-    targets = ["production"],
-    opts = pulumi.ResourceOptions(
-        provider = provider
-    )
-)
-
-deployment = vercel.Deployment("vercel-deployment",
-    project_id = project.id,
-    production = True,
-    ref = "main",
-    opts = pulumi.ResourceOptions(
-        provider = provider
-    )
-)
