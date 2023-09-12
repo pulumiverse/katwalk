@@ -37,9 +37,9 @@ config_docker_hostdir = None
 # Load config settings from `pulumi config set` user commands
 config = pulumi.Config()
 project_name = config.get("deploymentName") or "katwalk"
-token = config.require_secret("token")
-repoName = config.require("repoName")
-repoType = config.require("repoType")
+vclToken = config.require_secret("vclToken")
+gitRepoName = config.require("gitRepoName")
+gitRepoType = config.require("gitRepoType")
 
 # Service Deployment Configuration
 config_deploy_service = config.get_bool("deploy") or False # Default: do not deploy service
@@ -239,15 +239,15 @@ if config_deploy_service and config_container_runtime not in ['docker', 'azure',
 #############################################################
 
 provider = vercel.Provider("vercel-provider",
-    api_token = token
+    api_token = vclToken
 )
 
 project = vercel.Project("vercel-project", 
     name = "vercel-git-project",
     framework = "vue",
     git_repository = vercel.ProjectGitRepositoryArgs(
-        repo = repoName,
-        type = repoType
+        repo = gitRepoName,
+        type = gitRepoType
     ),
     root_directory = "src/app/katwalk-frontend",
     opts = pulumi.ResourceOptions(
