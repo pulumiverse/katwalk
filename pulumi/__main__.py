@@ -227,20 +227,21 @@ if config_deploy_service and config_container_runtime == "runpod":
 
 config_deploy_vercel = config.get_bool("deployVercel") or False # (Bool) Default: do not deploy frontend
 if config_deploy_vercel:
-    vclToken = config.require_secret("vclToken")
-    gitRepoName = config.require("gitRepoName")
-    gitRepoType = config.require("gitRepoType")
+    vcl_project_name = config.require("vclProjectName")
+    vcl_token = config.require_secret("vclToken")
+    git_repo_name = config.require("gitRepoName")
+    git_repo_type = config.require("gitRepoType")
 
     provider = vercel.Provider("vercel-provider",
-        api_token = vclToken
+        api_token = vcl_token
     )
 
     project = vercel.Project("vercel-project",
-        name = "vercel-git-project",
+        name = vcl_project_name,
         framework = "vue",
         git_repository = vercel.ProjectGitRepositoryArgs(
-            repo = gitRepoName,
-            type = gitRepoType
+            repo = git_repo_name,
+            type = git_repo_type
         ),
         root_directory = "src/app/katwalk-frontend",
         opts = pulumi.ResourceOptions(
@@ -266,6 +267,8 @@ if config_deploy_vercel:
             provider = provider
         )
     )
+    
+    pulumi.export("VercelAppURL", f"https://{vcl_project_name}.vercel.app")
 #############################################################
 # Error Handling
 #############################################################
